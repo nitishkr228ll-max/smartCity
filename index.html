@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart City Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+
+body {
+  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #ff6a00);
+  background-size: 400% 400%;
+  animation: bodyBG 15s ease infinite;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes bodyBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+
+.container {
+    display: grid;
+    grid-template-columns: 240px auto 350px;
+    height: 100vh;
+}
+
+.sidebar {
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #ff6a00);
+    padding: 20px;
+}
+    
+
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.menu {
+    list-style: none;
+}
+
+.menu li {
+    padding: 12px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    border-radius: 8px;
+}
+
+.menu li.active,.menu li:hover{
+    background: linear-gradient(to right, #3b4252, #4c566a);
+}
+
+.menu.bottom {
+    margin-top: 40px;
+}
+
+hr {
+    margin: 25px 0;
+    border: 0.5px solid #333;
+}
+
+
+.main {
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header input {
+    padding: 10px 15px;
+    width: 260px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    background: #172a46;
+    color: rgb(255, 255, 255);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns:1fr 1fr 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.card {
+    background: #162750;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(52, 5, 5, 0.35);
+}
+
+.card .part1 {
+    font-size: 24px;
+    margin-top: 10px;
+}
+.card .part2 {
+    font-size: 24px;
+    margin-top: 80px;
+}
+.card .part3 {
+    font-size: 24px;
+    margin-top: 80px;
+}
+.card .part4 {
+    font-size: 24px;
+    margin-top: 80px;
+}
+
+
+.large-card {
+    background: #18284d;
+    padding: 20px;
+    border-radius: 12px;
+    height: 260px;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+.graph-placeholder {
+    height: 200px;
+    width: 100%; /* add this */
+    background: #15181e;
+    border-radius: 10px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.graph-placeholder canvas {
+    width: 100% ;
+    height: 100%;
+}
+
+
+.right-panel {
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1b2a3a);
+    padding: 20px;}
+    
+
+.map-box{
+    background: #1c1f26;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+.map-placeholder {
+    height: 200px;
+    background: #0d0f12;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.date_time{
+    margin-top: 20px;
+}
+#aqiChartSidebar {
+    width: 100%;
+    height: 200px;
+    margin-top: 10px;
+}
+a{
+    text-decoration: none;
+    color: white;
+}
+
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <aside class="sidebar">
+        <h2>Smart City<br><span></span></h2>
+
+        <ul class="menu">
+            <li class="active">🌤 Weather</li>
+        
+        </ul>
+
+
+        <hr>
+        <p>
+            <h1>Welcome to Smart City Dashboard</h1>
+            <br>
+            <br>
+            <h3>Search any smart city to get details...</h3>
+        </p>
+        <hr>
+
+        <ul class="menu bottom">
+            <li><a href="https://www.thehindu.com/">The Hindu News</a></li>
+            <li><a href="http://127.0.0.1:5500/help.html">Help</a></li>
+            
+        </ul>
+    </aside>
+
+    <main class="main">
+
+        <form class="header">
+            <h1>Smart City Dashboard</h1>
+            <input type="text" placeholder="Search Your City" class="searchcity">
+        </form>
+
+        <div class="cards">
+            <div class="card">
+                <h3>Today's Weather</h3>
+                <p class="part1"></p>
+                <p class="part12"></p>
+
+            </div>
+            <div class="card">
+                <h3>Wind</h3>
+                <p class="part2"></p>
+            </div>
+            <div class="card">
+                <h3>Temperature</h3>
+                <p class="part3"></p>
+            </div>
+            <div class="card">
+                <h3>Humidity</h3>
+                <p class="part4"></p>
+            </div>
+        </div>
+
+        <div class="large-card">
+            <h3>Max-Min Weather Forecast of 7 Days</h3>
+            <div class="graph-placeholder">
+                 <canvas id="myChart"></canvas>
+            </div>
+        </div>
+
+    </main>
+
+    
+    <aside class="right-panel">
+        <div class="map-box" id="map">
+            <h3>Map</h3>
+            <div class="map-placeholder"></div>
+        </div>
+        <div class="aqi-card">
+        <h3>Air Quality Index:</h3>
+        <p class="part5"></p>
+        <canvas id="aqiChartSidebar" style="margin-top:10px;"></canvas>
+    </div>
+        <div class="date_time">
+            <div class="card">
+                <h3>Date & Time :</h3>
+                <p class="part6"></p>
+            </div>
+        </div>
+    </aside>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let cityName = document.querySelector("span")
+    let weatherType =document.querySelector(".part1")
+    let weatherTypedetail = document.querySelector(".part12")
+    let wind_data = document.querySelector(".part2")
+    let temperature_data = document.querySelector(".part3")
+    let Humidity = document.querySelector(".part4")
+    let citySearch = document.querySelector("form.header")
+    let input = document.querySelector("input")
+    let dateTime = document.querySelector(".part6")
+    let aqiChartSidebar = null;
+
+    let getDateTime = (dt) => {
+        let curDate = new Date(dt * 1000); 
+        console.log(curDate);
+        const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  };
+
+  const formatter = new Intl.DateTimeFormat("en-US", options);
+  console.log(formatter);
+  return formatter.format(curDate);
+};
+   
+    let myChart = null; // to store the chart instance
+
+    let map;
+    function initMap() {
+        map = L.map('map').setView([20, 78], 5); // India center
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18
+        }).addTo(map);
+    }
+
+
+    let city ="Pune"
+        citySearch.addEventListener("submit",(event) =>{
+            event.preventDefault()
+
+            let cityNNName = document.querySelector(".searchcity")
+            city = cityNNName.value
+            getWeatherDetails()
+            cityNNName.value=""
+            
+
+
+        })
+    
+
+     let getWeatherDetails = async () =>{
+            let weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=b20f7cd3f84ea015e2c05a72ec6893ed&units=metric`;
+            try {
+                let res = await fetch(weatherURL)
+                let data = await res.json()
+                console.log(data)
+                let { main, name, weather, wind,dt } = data;
+                weatherType.innerHTML=`<img src="http://openweathermap.org/img/wn/${weather[0].icon}@4x.png" />`
+                weatherTypedetail.innerHTML=weather[0].main
+                cityName.innerHTML=`${name}`
+                Humidity.innerHTML=`${main.humidity}%`
+                wind_data.innerHTML=`${wind.speed} m/s`
+                temperature_data.innerHTML=`${main.temp}&#176`
+                dateTime.innerHTML=getDateTime(dt)
+
+            }catch(error){
+                console.log(error)
+
+            }
+            async function getForecast(lat, lon) {
+            
+            let url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+            try {
+                let res = await fetch(url);
+                let data = await res.json();
+
+                  let days = data.daily.time.slice(0, 7); // next 7 days
+                  let maxTemp = data.daily.temperature_2m_max.slice(0, 7);
+                  let minTemp = data.daily.temperature_2m_min.slice(0, 7);
+
+                  let ctx = document.getElementById("myChart").getContext("2d");
+
+        if (myChart) myChart.destroy();
+
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [
+                    {
+                        label: "Max Temp &#176",
+                        data: maxTemp,
+                        borderColor: "red",
+                        backgroundColor: "rgb(255,0,0)",
+                        tension:0.4
+                    },
+                    {
+                        label: "Min Temp &#176",
+                        data: minTemp,
+                        borderColor: "blue",
+                        backgroundColor: "rgb(0,0,255,)",
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#fff"
+                        }
+                    }
+                },
+                scales: {
+                    x: { 
+                        ticks: { color: "#fff" },
+                        grid: { color: "#333" }
+                    },
+                    y: { 
+                        beginAtZero: false,
+                        ticks: { color: "#fff" },
+                        grid: { color: "#333" }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.log("Forecast error:", error);
+    }
+}
+
+
+           
+        let weatherMap =
+          `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=a83504bbb7a37124e4a3788b84f08813`;
+        
+        try {
+            let result = await fetch(weatherMap);
+            let map_data = await result.json();
+
+
+            let lat = map_data[0].lat;
+            let lon = map_data[0].lon;
+
+            map.setView([lat, lon], 12);
+
+            L.marker([lat, lon]).addTo(map)
+              .bindPopup(city)
+              .openPopup();
+
+            await getForecast(lat, lon);
+
+            
+        let pollutionURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=a83504bbb7a37124e4a3788b84f08813`;
+        let pollutionRes = await fetch(pollutionURL);
+        let pollutionData = await pollutionRes.json();
+        
+
+
+        let components = pollutionData.list[0].components;
+let labels = Object.keys(components); 
+let values = Object.values(components);
+
+let ctxSidebar = document.getElementById("aqiChartSidebar").getContext("2d");
+if (aqiChartSidebar) aqiChartSidebar.destroy(); 
+
+aqiChartSidebar = new Chart(ctxSidebar, {
+    type: 'pie',
+    data: {
+        labels: labels,
+        datasets: [{
+            data: values,
+            backgroundColor: [
+                "#FF6384",
+                "#36A2EB",
+                "#FFCE56",
+                "#4BC0C0",
+                "#9966FF",
+                "#FF9F40",
+                "#C9CBCF",
+                "#FF6666"
+            ]
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                labels: {
+                    color: "#fff"
+                }
+            }
+        }
+    }
+});
+        
+
+
+     } catch (error) {
+            console.log(error);
+        }
+}
+        
+    ;
+
+ window.addEventListener("load", ()=>{initMap();getWeatherDetails();
+});
+
+
+
+</script>
+</body>
+</html>
